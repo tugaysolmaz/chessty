@@ -1,7 +1,11 @@
 use crate::pieces::Color;
 use crate::pieces::Piece;
 
+pub const ALPHABET: &'static str = "abcdefghijklmnopqrstuvwxyz";
+pub const STANDARD_SIZE: i32 = 64;
+
 pub struct Table {
+    pub n_turn: i32,
     pub turn: Color,
     pub table: Vec<Piece>, // squared size
     pub graveyard: Vec<Piece>,
@@ -10,6 +14,7 @@ pub struct Table {
 impl Table {
     fn new_empty() -> Table {
         Table {
+            n_turn: 0,
             turn: Color::White,
             table: vec![Piece::Empty; 64],
             graveyard: vec![Piece::Empty; 0],
@@ -48,6 +53,10 @@ impl Table {
         }
     }
 
+    fn increment_turn(&mut self) {
+        self.n_turn += 1;
+    }
+
     pub fn switch_turn(&mut self) {
         self.turn = match self.turn {
             Color::Black => Color::White,
@@ -56,16 +65,16 @@ impl Table {
         }
     }
 
-    pub fn move_piece(&mut self, from: usize, to: usize) -> bool {
+    pub fn move_piece(&mut self, from: i32, to: i32) -> bool {
         if self.is_possible(from, to) {
-            match self.table[to] {
+            match self.table[to as usize] {
                 Piece::Empty => (),
                 _ => {
-                    self.graveyard.push(self.table[to].clone());
+                    self.graveyard.push(self.table[to as usize].clone());
                 }
             };
-            self.table[to] = self.table[from].clone();
-            self.table[from] = Piece::Empty;
+            self.table[to as usize] = self.table[from as usize].clone();
+            self.table[from as usize] = Piece::Empty;
             true
         } else {
             false
@@ -73,12 +82,12 @@ impl Table {
     }
 
     #[allow(dead_code)]
-    pub fn is_possible(&self, _from: usize, _to: usize) -> bool {
+    pub fn is_possible(&self, _from: i32, _to: i32) -> bool {
         true
     }
 
     #[allow(dead_code)]
-    pub fn get_possible_moves(&self, _where_: usize) -> Vec<usize> {
+    pub fn get_possible_moves(&self, _where_: i32) -> Vec<i32> {
         vec![0]
     }
 }
