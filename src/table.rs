@@ -2,7 +2,8 @@ use crate::pieces::Color;
 use crate::pieces::Piece;
 
 pub const ALPHABET: &'static str = "abcdefghijklmnopqrstuvwxyz";
-pub const STANDARD_SIZE: i32 = 64;
+pub const SIZE_SQUARE: i32 = 8;
+pub const STANDARD_SIZE: i32 = SIZE_SQUARE * SIZE_SQUARE;
 
 pub struct Table {
     pub n_turn: i32,
