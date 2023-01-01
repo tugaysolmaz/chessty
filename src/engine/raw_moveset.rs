@@ -44,6 +44,10 @@ pub fn move_horizontal(pos: i32, right: bool) -> i32 {
     }
 }
 
+pub fn pos_arr2int(pos: [i32; 2]) -> i32 {
+    pos[0] + pos[1] * SIZE_SQUARE
+}
+
 pub fn pos_int2str(pos: &i32) -> String {
     let upos = *pos as usize;
     format!(
@@ -69,10 +73,10 @@ pub fn knight_moves(pos: i32) -> Vec<i32> {
         move_vertical(move_vertical(move_horizontal(pos, false), true), true),
         move_vertical(move_vertical(move_horizontal(pos, true), false), false),
         move_vertical(move_vertical(move_horizontal(pos, false), false), false),
-        move_vertical(move_horizontal(move_horizontal(pos, true), true), true),
-        move_vertical(move_horizontal(move_horizontal(pos, true), true), false),
-        move_vertical(move_horizontal(move_horizontal(pos, false), false), true),
-        move_vertical(move_horizontal(move_horizontal(pos, false), false), true),
+        move_horizontal(move_horizontal(move_vertical(pos, true), true), true),
+        move_horizontal(move_horizontal(move_vertical(pos, false), true), true),
+        move_horizontal(move_horizontal(move_vertical(pos, true), false), false),
+        move_horizontal(move_horizontal(move_vertical(pos, false), false), false),
     ]
     .into_iter()
     .filter(|&pos| pos != -1)
@@ -87,7 +91,10 @@ pub fn bishop_moves(pos: i32) -> Vec<i32> {
         let mut new_pos = pos;
         loop {
             new_pos = move_horizontal(move_vertical(new_pos, dpair[1]), dpair[0]);
-            let _ = apppend_valid_pos(&mut res, &new_pos);
+            let valid = apppend_valid_pos(&mut res, &new_pos);
+            if !valid {
+                break;
+            }
         }
     }
 
@@ -98,16 +105,17 @@ pub fn rook_moves(pos: i32) -> Vec<i32> {
     let mut res = vec![];
 
     let directions = [true, false];
-    for d in directions {
-        let mut new_pos = pos;
+    for di in directions {
+        let mut new_pos = pos.clone();
         loop {
-            new_pos = move_vertical(new_pos, d);
+            new_pos = move_vertical(new_pos, di);
             if !apppend_valid_pos(&mut res, &new_pos) {
                 break;
             }
         }
+        new_pos = pos.clone();
         loop {
-            new_pos = move_horizontal(new_pos, d);
+            new_pos = move_horizontal(new_pos, di);
             if !apppend_valid_pos(&mut res, &new_pos) {
                 break;
             }
@@ -123,16 +131,17 @@ pub fn queen_moves(pos: i32) -> Vec<i32> {
 }
 
 pub fn king_moves(pos: i32) -> Vec<i32> {
-    let mut res = vec![];
-    apppend_valid_pos(&mut res, &(pos + 1));
-    apppend_valid_pos(&mut res, &(pos + SIZE_SQUARE + 1));
-    apppend_valid_pos(&mut res, &(pos + SIZE_SQUARE));
-    apppend_valid_pos(&mut res, &(pos + SIZE_SQUARE - 1));
-    apppend_valid_pos(&mut res, &(pos - 1));
-    apppend_valid_pos(&mut res, &(pos - SIZE_SQUARE - 1));
-    apppend_valid_pos(&mut res, &(pos - SIZE_SQUARE));
-    apppend_valid_pos(&mut res, &(pos - SIZE_SQUARE + 1));
-    res
+    let res = vec![
+        move_vertical(move_horizontal(pos, false), true),
+        move_vertical(pos, true),
+        move_vertical(move_horizontal(pos, true), true),
+        move_horizontal(pos, false),
+        move_horizontal(pos, true),
+        move_vertical(move_horizontal(pos, false), false),
+        move_vertical(pos, false),
+        move_vertical(move_horizontal(pos, true), false),
+    ];
+    res.into_iter().filter(|x| valid_pos(x)).collect()
 }
 
 pub fn pawn_moves(pos: i32, up: bool) -> Vec<i32> {

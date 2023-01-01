@@ -1,5 +1,5 @@
 use crate::pieces::Color;
-use crate::pieces::Piece;
+use crate::pieces::{Piece, PieceType};
 
 pub const ALPHABET: &'static str = "abcdefghijklmnopqrstuvwxyz";
 pub const SIZE_SQUARE: i32 = 8;
@@ -17,8 +17,8 @@ impl Table {
         Table {
             n_turn: 0,
             turn: Color::White,
-            table: vec![Piece::Empty; 64],
-            graveyard: vec![Piece::Empty; 0],
+            table: vec![Piece::empty(); 64],
+            graveyard: vec![Piece::empty(); 0],
         }
     }
 
@@ -31,64 +31,26 @@ impl Table {
     pub fn populate_standard(&mut self) {
         for num in 0..self.table.len() {
             self.table[num] = match num {
-                0 => Piece::Rook(Color::White), // this is a1 position
-                1 => Piece::Knight(Color::White),
-                2 => Piece::Bishop(Color::White),
-                3 => Piece::Queen(Color::White),
-                4 => Piece::King(Color::White),
-                5 => Piece::Bishop(Color::White),
-                6 => Piece::Knight(Color::White),
-                7 => Piece::Rook(Color::White),
-                8..=15 => Piece::Pawn(Color::White),
-                47..=55 => Piece::Pawn(Color::Black),
-                56 => Piece::Rook(Color::Black),
-                57 => Piece::Knight(Color::Black),
-                58 => Piece::Bishop(Color::Black),
-                59 => Piece::Queen(Color::Black),
-                60 => Piece::King(Color::Black),
-                61 => Piece::Bishop(Color::Black),
-                62 => Piece::Knight(Color::Black),
-                63 => Piece::Rook(Color::Black),
-                _ => Piece::Empty,
+                0 => Piece::new(0, PieceType::Rook, Color::White), // this is a1 position
+                1 => Piece::new(1, PieceType::Knight, Color::White),
+                2 => Piece::new(2, PieceType::Bishop, Color::White),
+                3 => Piece::new(3, PieceType::Queen, Color::White),
+                4 => Piece::new(4, PieceType::King, Color::White),
+                5 => Piece::new(5, PieceType::Bishop, Color::White),
+                6 => Piece::new(6, PieceType::Knight, Color::White),
+                7 => Piece::new(7, PieceType::Rook, Color::White),
+                8..=15 => Piece::new(7, PieceType::Pawn, Color::White),
+                47..=55 => Piece::new(56, PieceType::Pawn, Color::Black),
+                56 => Piece::new(56, PieceType::Rook, Color::Black),
+                57 => Piece::new(57, PieceType::Knight, Color::Black),
+                58 => Piece::new(58, PieceType::Bishop, Color::Black),
+                59 => Piece::new(59, PieceType::Queen, Color::Black),
+                60 => Piece::new(60, PieceType::King, Color::Black),
+                61 => Piece::new(61, PieceType::Bishop, Color::Black),
+                62 => Piece::new(62, PieceType::Knight, Color::Black),
+                63 => Piece::new(63, PieceType::Rook, Color::Black),
+                _ => Piece::empty(),
             };
         }
-    }
-
-    fn increment_turn(&mut self) {
-        self.n_turn += 1;
-    }
-
-    pub fn switch_turn(&mut self) {
-        self.turn = match self.turn {
-            Color::Black => Color::White,
-            Color::White => Color::Black,
-            _ => Color::White,
-        }
-    }
-
-    pub fn move_piece(&mut self, from: i32, to: i32) -> bool {
-        if self.is_possible(from, to) {
-            match self.table[to as usize] {
-                Piece::Empty => (),
-                _ => {
-                    self.graveyard.push(self.table[to as usize].clone());
-                }
-            };
-            self.table[to as usize] = self.table[from as usize].clone();
-            self.table[from as usize] = Piece::Empty;
-            true
-        } else {
-            false
-        }
-    }
-
-    #[allow(dead_code)]
-    pub fn is_possible(&self, _from: i32, _to: i32) -> bool {
-        true
-    }
-
-    #[allow(dead_code)]
-    pub fn get_possible_moves(&self, _where_: i32) -> Vec<i32> {
-        vec![0]
     }
 }
