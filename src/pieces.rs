@@ -1,11 +1,21 @@
-#[derive(Clone)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Color {
     White,
     Black,
     None,
 }
 
-#[derive(Clone)]
+impl Color {
+    pub fn opposite(&self) -> Color {
+        match self {
+            Color::Black => Color::White,
+            Color::White => Color::Black,
+            _ => Color::None,
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
 pub enum PieceType {
     Empty, // color
     Pawn,
@@ -15,6 +25,7 @@ pub enum PieceType {
     Queen,
     King,
 }
+
 #[derive(Clone)]
 pub struct Piece {
     pub type_: PieceType,
@@ -39,13 +50,6 @@ impl Piece {
             pos: -1,
             color: Color::None,
             en_passantable: false,
-        }
-    }
-
-    pub fn is_en_passantable(&self) {
-        match self.type_ {
-            PieceType::Pawn => (),
-            _ => (),
         }
     }
 }

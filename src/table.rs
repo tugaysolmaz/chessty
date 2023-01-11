@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut};
+
 use crate::pieces::Color;
 use crate::pieces::{Piece, PieceType};
 
@@ -5,19 +7,56 @@ pub const ALPHABET: &'static str = "abcdefghijklmnopqrstuvwxyz";
 pub const SIZE_SQUARE: i32 = 8;
 pub const STANDARD_SIZE: i32 = SIZE_SQUARE * SIZE_SQUARE;
 
+fn check_valid_index(i: &i32) {
+    if *i < 0 && *i >= STANDARD_SIZE {
+        panic!("Invalid index provided, index smaller than zero: {i}!")
+    }
+}
+
+#[derive(Clone)]
 pub struct Table {
     pub n_turn: i32,
     pub turn: Color,
     pub table: Vec<Piece>, // squared size
+    pub history: Vec<[i32; 2]>,
     pub graveyard: Vec<Piece>,
 }
 
+impl Index<&usize> for Table {
+    type Output = Piece;
+    fn index<'a>(&'a self, i: &usize) -> &'a Piece {
+        &self.table[*i]
+    }
+}
+
+impl IndexMut<&usize> for Table {
+    fn index_mut(&mut self, index: &usize) -> &mut Piece {
+        &mut self.table[*index]
+    }
+}
+
+impl Index<&i32> for Table {
+    type Output = Piece;
+    fn index<'a>(&'a self, index: &i32) -> &'a Piece {
+        check_valid_index(index);
+        &self.table[*index as usize]
+    }
+}
+
+impl IndexMut<&i32> for Table {
+    fn index_mut(&mut self, index: &i32) -> &mut Piece {
+        check_valid_index(index);
+        &mut self.table[*index as usize]
+    }
+}
+
 impl Table {
-    fn new_empty() -> Table {
+    pub fn new_empty() -> Table {
         Table {
             n_turn: 0,
             turn: Color::White,
             table: vec![Piece::empty(); 64],
+            history: vec![],
             graveyard: vec![Piece::empty(); 0],
         }
     }
